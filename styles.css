@@ -1,0 +1,314 @@
+/* ===========================================================
+   MiniMax Assistant styles
+   Mobile-first；避开 position:fixed；safe-area-inset；
+   触摸目标 ≥ 44×44px；不依赖 hover；字号用 var(--font-*)
+   =========================================================== */
+
+.mmxob-chat-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  /* safe-area */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  box-sizing: border-box;
+}
+
+/* Header */
+.mmxob-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  gap: 8px;
+}
+.mmxob-chat-title {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: var(--font-ui-medium, 14px);
+}
+.mmxob-chat-title-text {
+  font-size: var(--font-ui-medium, 14px);
+}
+.mmxob-chat-model {
+  font-size: var(--font-ui-small, 12px);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.mmxob-chat-header-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* 通用小图标按钮：44×44 触屏 */
+.mmxob-icon-btn {
+  appearance: none;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  border-radius: 6px;
+  font-size: var(--font-ui-small, 12px);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.mmxob-icon-btn:active {
+  background: var(--background-modifier-hover);
+}
+.mmxob-icon-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* Messages */
+.mmxob-chat-messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 12px;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+}
+
+.mmxob-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small, 13px);
+  text-align: center;
+  padding: 16px;
+  line-height: 1.6;
+}
+
+.mmxob-msg {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  font-size: var(--font-text-size, 15px);
+  line-height: 1.55;
+  word-break: break-word;
+}
+.mmxob-msg-user {
+  background: var(--background-primary-alt);
+}
+.mmxob-msg-system {
+  background: transparent;
+  border-style: dashed;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small, 12px);
+}
+.mmxob-msg-error {
+  border-color: var(--text-error, #d44);
+}
+
+.mmxob-msg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.mmxob-msg-role {
+  font-weight: 600;
+  font-size: var(--font-ui-small, 12px);
+  color: var(--text-muted);
+}
+
+.mmxob-msg-body p:first-child {
+  margin-top: 0;
+}
+.mmxob-msg-body pre {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  padding: 8px 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: var(--font-monospace, 13px);
+}
+.mmxob-msg-body code {
+  background: var(--background-primary);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: var(--font-monospace, 13px);
+}
+.mmxob-msg-body pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+.mmxob-msg-body blockquote {
+  border-left: 3px solid var(--interactive-accent);
+  margin: 4px 0;
+  padding-left: 10px;
+  color: var(--text-muted);
+}
+
+/* 流式中的辅助指示 */
+.mmxob-streaming::after {
+  content: "▍";
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--text-accent);
+  animation: mmxob-blink 1s steps(1) infinite;
+}
+@keyframes mmxob-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mmxob-streaming::after {
+    animation: none;
+  }
+}
+
+/* Input area：sticky 避免 fixed 怪癖 */
+.mmxob-chat-input-area {
+  border-top: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mmxob-chat-switches {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: var(--font-ui-small, 12px);
+  color: var(--text-muted);
+}
+.mmxob-chat-stream-toggle {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  height: 36px;
+  padding: 0 6px;
+}
+.mmxob-chat-stream-toggle input {
+  width: 22px;
+  height: 22px;
+}
+.mmxob-chat-status {
+  font-size: var(--font-ui-small, 12px);
+}
+
+.mmxob-chat-composer-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+.mmxob-chat-input {
+  flex: 1 1 auto;
+  min-height: 44px;
+  max-height: 30vh;
+  font-size: var(--font-text-size, 15px);
+  padding: 10px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.mmxob-chat-input:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+  border-color: var(--interactive-accent);
+}
+
+/* 发送/停止按钮：44px 触屏高度 */
+.mmxob-btn {
+  appearance: none;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: var(--font-ui-medium, 14px);
+  -webkit-tap-highlight-color: transparent;
+}
+.mmxob-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+.mmxob-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.mmxob-btn-primary {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent, #fff);
+  border-color: var(--interactive-accent);
+}
+.mmxob-btn-danger {
+  background: var(--background-modifier-error, #d44);
+  color: #fff;
+  border-color: var(--background-modifier-error, #d44);
+}
+.mmxob-btn-primary:active {
+  background: var(--interactive-accent-hover);
+}
+.mmxob-btn-danger:active {
+  filter: brightness(0.9);
+}
+
+/* 设置里的提示块（iOS） */
+.mmxob-ios-note {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  font-size: var(--font-ui-small, 13px);
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* 设置输入框在窄屏上别太挤 */
+@media (max-width: 480px) {
+  .mmxob-chat-header {
+    padding: 6px 8px;
+  }
+  .mmxob-chat-messages {
+    padding: 6px 8px;
+  }
+  .mmxob-chat-input-area {
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  }
+  .mmxob-icon-btn {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+  }
+}
+
+/* 横屏（iPad）给一个更宽的最大宽度 */
+@media (min-width: 1024px) and (orientation: landscape) {
+  .mmxob-chat-root {
+    width: 100%;
+  }
+}

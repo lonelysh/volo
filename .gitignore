@@ -1,0 +1,11 @@
+node_modules/
+*.log
+.DS_Store
+data.json
+.obsidian/
+*.js.map
+styles.css.map
+.idea/
+.vscode/
+# release 目录（如果将来用 GitHub Actions 自动产出 release artifact）
+release/

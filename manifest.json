@@ -1,0 +1,10 @@
+{
+  "id": "mmxob",
+  "name": "MiniMax Assistant",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Chat with MiniMax (MiniMax) Chinese large language models in Obsidian. Sidebar chat, selection actions, and full-note processing — iOS compatible.",
+  "author": "mmxob contributors",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}
