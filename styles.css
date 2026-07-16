@@ -1,0 +1,979 @@
+/* ===========================================================
+   Volo styles
+   v0.4.1 — 紧凑密度 + 空状态卡片 + ⚡ 快捷菜单 + 焦点感知
+   =========================================================== */
+
+.volo-chat-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  /* safe-area */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  box-sizing: border-box;
+}
+
+/* 会话消息计数：状态行右侧灰色小字 */
+.volo-chat-session-indicator {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* 通用小图标按钮：36×36 紧凑触屏 */
+.volo-icon-btn {
+  appearance: none;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-icon-btn:active {
+  background: var(--background-modifier-hover);
+}
+.volo-icon-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* Messages */
+.volo-chat-messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 12px;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+}
+
+.volo-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+  padding: 16px;
+  line-height: 1.6;
+}
+
+.volo-msg {
+  margin: 8px 0;
+  padding: 6px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+  word-break: break-word;
+}
+.volo-msg-user {
+  background: var(--background-primary-alt);
+}
+.volo-msg-system {
+  background: transparent;
+  border-style: dashed;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.volo-msg-error {
+  border-color: var(--text-error, #d44);
+}
+
+.volo-msg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.volo-msg-role {
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* 消息底部操作区：复制 / 插入光标 / 替换笔记 / 追加末尾 */
+.volo-msg-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.volo-msg-actions-footer {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--background-modifier-border);
+  justify-content: flex-end;
+}
+.volo-msg-action-btn {
+  appearance: none;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  min-height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.volo-msg-action-btn:active {
+  background: var(--background-modifier-hover);
+}
+.volo-msg-action-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+.volo-msg-body p:first-child {
+  margin-top: 0;
+}
+.volo-msg-body pre {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  padding: 8px 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: var(--font-monospace, 13px);
+}
+.volo-msg-body code {
+  background: var(--background-primary);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: var(--font-monospace, 13px);
+}
+.volo-msg-body pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+.volo-msg-body blockquote {
+  border-left: 3px solid var(--interactive-accent);
+  margin: 4px 0;
+  padding-left: 10px;
+  color: var(--text-muted);
+}
+
+/* 流式中的辅助指示 */
+.volo-streaming::after {
+  content: "▍";
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--text-accent);
+  animation: volo-blink 1s steps(1) infinite;
+}
+@keyframes volo-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .volo-streaming::after {
+    animation: none;
+  }
+}
+
+/* Input area：sticky 避免 fixed 怪癖 */
+.volo-chat-input-area {
+  border-top: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.volo-chat-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 1px 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.volo-chat-status {
+  font-size: 11px;
+}
+
+.volo-chat-composer-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+.volo-chat-input {
+  flex: 1 1 auto;
+  min-height: 36px;
+  max-height: 30vh;
+  font-size: 14px;
+  padding: 7px 9px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-chat-input:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+  border-color: var(--interactive-accent);
+}
+
+/* 发送/停止按钮：36px 紧凑 */
+.volo-btn {
+  appearance: none;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+.volo-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.volo-btn-primary {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent, #fff);
+  border-color: var(--interactive-accent);
+}
+.volo-btn-danger {
+  background: var(--background-modifier-error, #d44);
+  color: #fff;
+  border-color: var(--background-modifier-error, #d44);
+}
+.volo-btn-primary:active {
+  background: var(--interactive-accent-hover);
+}
+.volo-btn-danger:active {
+  filter: brightness(0.9);
+}
+
+/* 设置里的提示块（iOS） */
+.volo-ios-note {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ===========================================================
+   v0.4.1 — 设置：短名字的输入框单独占一整行
+   - 解决 API Key / Base URL / Tavily / Brave 这些 Setting
+     左边名字只有 7~9 个字符、右侧输入框显得孤零零靠右的问题
+   - 只覆盖纯文本 / 密码输入，不动 dropdown / slider / toggle
+   =========================================================== */
+.volo-setting-wide-input .setting-item-control {
+  grid-column: 1 / -1;
+  margin-left: 0;
+}
+.volo-setting-wide-input .setting-item-control input[type="text"],
+.volo-setting-wide-input .setting-item-control input[type="password"] {
+  width: 100%;
+  max-width: 480px;
+}
+
+/* 设置输入框在窄屏上别太挤 */
+@media (max-width: 480px) {
+  .volo-chat-messages {
+    padding: 6px 8px;
+  }
+  .volo-chat-status-row {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .volo-chat-input-area {
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  }
+  .volo-icon-btn {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+  }
+}
+
+/* 横屏（iPad）给一个更宽的最大宽度 */
+@media (min-width: 1024px) and (orientation: landscape) {
+  .volo-chat-root {
+    width: 100%;
+  }
+}
+
+/* ===========================================================
+   v0.3.1 — ⚡ composer menu button (left of textarea)
+   =========================================================== */
+
+.volo-chat-quick-menu-btn {
+  appearance: none;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 0;
+  flex: 0 0 auto;
+  -webkit-tap-highlight-color: transparent;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.volo-chat-quick-menu-btn:hover {
+  background: var(--background-modifier-hover);
+}
+.volo-chat-quick-menu-btn:active {
+  background: var(--background-modifier-hover);
+}
+.volo-chat-quick-menu-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* ===========================================================
+   v0.3.1 — ⚙ status row gear (moved from quick-row)
+   =========================================================== */
+
+.volo-chat-quick-gear {
+  appearance: none;
+  flex: 0 0 auto;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1;
+}
+.volo-chat-quick-gear:active {
+  background: var(--background-modifier-hover);
+}
+.volo-chat-quick-gear:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* ===========================================================
+   v0.3.1 — 空状态 quick prompt 卡片（消息区内）
+   =========================================================== */
+
+.volo-chat-empty-quick {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px 12px;
+}
+.volo-chat-empty-card {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  font-family: inherit;
+  color: var(--text-normal);
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-chat-empty-card:hover {
+  background: var(--background-modifier-hover);
+}
+.volo-chat-empty-card:active {
+  background: var(--background-modifier-hover);
+}
+.volo-chat-empty-card:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+.volo-chat-empty-card-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex: 0 0 auto;
+  width: 22px;
+  text-align: center;
+}
+.volo-chat-empty-card-label {
+  flex: 1 1 auto;
+}
+.volo-chat-empty-card-desc {
+  color: var(--text-muted);
+  font-size: 11px;
+  flex: 1 1 auto;
+  text-align: right;
+}
+.volo-chat-empty-card-chev {
+  color: var(--text-muted);
+  font-size: 13px;
+  flex: 0 0 auto;
+  line-height: 1;
+}
+.volo-chat-empty-card[data-source="custom"] {
+  border-style: dashed;
+}
+
+/* ===========================================================
+   v0.3.1 — 焦点感知：focus 时淡化消息区 + 高亮 textarea
+   =========================================================== */
+
+.volo-chat-root.is-input-focused .volo-chat-messages {
+  opacity: 0.55;
+  transition: opacity 120ms ease;
+}
+.volo-chat-root:not(.is-input-focused) .volo-chat-messages {
+  opacity: 1;
+  transition: opacity 120ms ease;
+}
+.volo-chat-root.is-input-focused .volo-chat-input {
+  border-color: var(--interactive-accent);
+}
+
+/* ===========================================================
+   v0.3.1 — Settings: 高级设置折叠样式
+   =========================================================== */
+
+.volo-settings-advanced {
+  margin: 12px 0 16px;
+  padding: 8px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+}
+.volo-settings-advanced > summary {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-normal);
+  user-select: none;
+}
+.volo-settings-advanced > summary::-webkit-details-marker {
+  display: inline-block;
+  margin-right: 4px;
+}
+
+/* ===========================================================
+   v0.3.1 — 隐藏已废弃的 chip row / 联网 chip / 旧 gear 样式
+   =========================================================== */
+
+.volo-chat-quick-row,
+.volo-chat-quick-chip,
+.volo-chat-quick-chip-icon,
+.volo-chat-quick-chip-label,
+.volo-chat-quick-spacer,
+.volo-chat-quick-search-toggle {
+  display: none !important;
+}
+
+/* 自定义 Quick Prompt 行 */
+.volo-custom-quick-prompt-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+}
+
+/* ===========================================================
+   AI 大纲视图（与 Chat 并列的右栏子页面）
+   - 前缀 volo-ao- 避免与 volo-chat-* 冲突
+   - 36px 紧凑触屏密度，safe-area 已考虑
+   =========================================================== */
+
+.volo-ao-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  /* safe-area */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  box-sizing: border-box;
+}
+
+/* ---- 头部：标题 + ⚙ ---- */
+.volo-ao-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex: 0 0 auto;
+  min-height: 32px;
+}
+.volo-ao-header-title {
+  font-weight: 600;
+  font-size: var(--font-ui-medium, 14px);
+  color: var(--text-normal);
+}
+.volo-ao-gear {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-ao-gear:hover,
+.volo-ao-gear:active {
+  background: var(--background-modifier-hover);
+}
+.volo-ao-gear:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+/* ---- 笔记标签 ---- */
+.volo-ao-note-label {
+  padding: 2px 10px;
+  font-size: var(--font-ui-small, 11px);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--background-modifier-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 0 auto;
+  min-height: 24px;
+  line-height: 20px;
+}
+
+/* ---- 大纲区域 ---- */
+.volo-ao-outline {
+  max-height: 45%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 8px 8px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex: 0 1 auto;
+  min-height: 0;
+}
+.volo-ao-outline-empty {
+  padding: 12px;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small, 12px);
+  text-align: center;
+}
+
+.volo-ao-outline-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-left: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: var(--font-ui-small, 12px);
+  color: var(--text-normal);
+  font-family: inherit;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-ao-outline-item:hover {
+  background: var(--background-modifier-hover);
+}
+.volo-ao-outline-item.is-selected {
+  background: var(--background-secondary);
+  border-left-color: var(--interactive-accent);
+}
+.volo-ao-outline-item-heading {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.volo-ao-outline-item-actions {
+  display: none;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+.volo-ao-outline-item:hover .volo-ao-outline-item-actions,
+.volo-ao-outline-item:focus-within .volo-ao-outline-item-actions {
+  display: inline-flex;
+}
+/* 触屏设备默认常显 */
+@media (hover: none) {
+  .volo-ao-outline-item-actions {
+    display: inline-flex;
+  }
+}
+
+.volo-ao-chip {
+  appearance: none;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  font-size: 12px;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+}
+.volo-ao-chip:hover,
+.volo-ao-chip:active {
+  background: var(--background-modifier-hover);
+}
+.volo-ao-chip:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+/* ---- 对话区域 ---- */
+.volo-ao-chat-wrap {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.volo-ao-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: var(--font-ui-small, 11px);
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+.volo-ao-chat-scope {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+}
+.volo-ao-scope-pill {
+  appearance: none;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  min-height: 24px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--text-normal);
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  flex: 0 0 auto;
+}
+.volo-ao-scope-pill:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.volo-ao-scope-pill:hover:not(:disabled) {
+  background: var(--background-modifier-hover);
+}
+.volo-ao-scope-pill:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+.volo-ao-quick-search-toggle {
+  margin-left: auto;
+  appearance: none;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  min-height: 24px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: inherit;
+  flex: 0 0 auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-ao-quick-search-toggle:hover {
+  background: var(--background-modifier-hover);
+}
+.volo-ao-quick-search-toggle:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+.volo-ao-quick-search-toggle.is-active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent, #fff);
+  border-color: var(--interactive-accent);
+}
+
+.volo-ao-status {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* ---- 消息区 ---- */
+.volo-ao-messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 10px 8px;
+  font-size: var(--font-text-size, 14px);
+  line-height: 1.5;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.volo-ao-msg {
+  margin: 4px 0;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  word-break: break-word;
+}
+.volo-ao-msg-user {
+  background: var(--background-primary-alt);
+}
+.volo-ao-msg-error {
+  border-color: var(--text-error, #d44);
+}
+
+.volo-ao-msg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+.volo-ao-msg-role {
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.volo-ao-msg-body p:first-child {
+  margin-top: 0;
+}
+.volo-ao-msg-body pre {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  padding: 6px 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 12px;
+}
+.volo-ao-msg-body code {
+  background: var(--background-primary);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+.volo-ao-msg-body pre code {
+  background: transparent;
+  padding: 0;
+}
+.volo-ao-msg-body blockquote {
+  border-left: 3px solid var(--interactive-accent);
+  margin: 4px 0;
+  padding-left: 10px;
+  color: var(--text-muted);
+}
+
+.volo-ao-msg-actions {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.volo-ao-insert-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  min-height: 24px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-ao-insert-btn:hover,
+.volo-ao-insert-btn:active {
+  background: var(--background-modifier-hover);
+}
+.volo-ao-insert-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+/* 流式指示：复用 volo-streaming 关键帧 */
+.volo-ao-msg.volo-streaming::after {
+  content: "▍";
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--text-accent);
+  animation: volo-blink 1s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .volo-ao-msg.volo-streaming::after {
+    animation: none;
+  }
+}
+
+/* 焦点感知：textarea focus 时淡化消息区 */
+.volo-ao-root.is-input-focused .volo-ao-messages {
+  opacity: 0.55;
+  transition: opacity 120ms ease;
+}
+.volo-ao-root:not(.is-input-focused) .volo-ao-messages {
+  opacity: 1;
+  transition: opacity 120ms ease;
+}
+.volo-ao-root.is-input-focused .volo-ao-input {
+  border-color: var(--interactive-accent);
+}
+
+/* ---- 输入栏 ---- */
+.volo-ao-composer {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  align-items: stretch;
+  flex: 0 0 auto;
+}
+.volo-ao-input {
+  flex: 1 1 auto;
+  min-height: 36px;
+  max-height: 25vh;
+  font-size: var(--font-text-size, 14px);
+  padding: 7px 9px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-ao-input:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  border-color: var(--interactive-accent);
+}
+.volo-ao-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.volo-ao-btn {
+  appearance: none;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-ao-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+.volo-ao-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.volo-ao-btn-primary {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent, #fff);
+  border-color: var(--interactive-accent);
+}
+.volo-ao-btn-primary:active:not(:disabled) {
+  background: var(--interactive-accent-hover);
+}
+
+/* ---- 窄屏适配（移动端）---- */
+@media (max-width: 480px) {
+  .volo-ao-outline {
+    padding: 4px 6px 6px;
+  }
+  .volo-ao-messages {
+    padding: 4px 8px 8px;
+  }
+  .volo-ao-composer {
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  }
+  .volo-ao-gear {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+  }
+}
