@@ -1,9 +1,9 @@
 {
   "id": "volo",
   "name": "Volo",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "minAppVersion": "1.5.0",
-  "description": "Volo — sidebar chat with LLMs in Obsidian. Sidebar chat, selection actions, whole-note processing, quick prompts, section-scoped AI outline view. iOS compatible. Works with any OpenAI-compatible endpoint via the Base URL setting.",
+  "description": "Adds a sidebar chat with LLMs, plus selection actions, whole-note processing, quick prompts, and section-scoped outlines. iOS ready. Use any OpenAI-compatible endpoint via the Base URL setting.",
   "author": "lonelysh",
   "authorUrl": "https://github.com/lonelysh/volo",
   "isDesktopOnly": false,
