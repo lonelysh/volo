@@ -865,12 +865,22 @@ export class ChatView extends ItemView {
       // 1. 解析上下文
       let text = "";
       let note = "";
+      // v0.1.7：noteTitle / noteFileCount 用于把"已注入笔记/文件夹"的提示渲染到可见气泡，
+      //           同时给系统消息里的 [笔记] {title} 提供标题，避免文件名被丢弃。
+      let noteTitle = "";
+      let noteFileCount = 0;
       const needsNote = qp.needsActiveNote === true || qp.context === "note";
       const needsSelection = qp.needsSelection === true || qp.context === "selection";
       // v0.1.6：folder scope 强制覆盖 note 来源；其它情况维持既有逻辑。
       if (this.contextScope === "folder") {
         const ctx = await this.getCurrentContextText();
         note = truncateByChars(ctx.source, 12000);
+        noteTitle = ctx.noteTitle || (this.contextFolder ? this.contextFolder.name : "文件夹");
+        if (this.contextFolder) {
+          noteFileCount = this.contextFolder.children.filter(
+            (c): c is TFile => c instanceof TFile && c.extension === "md",
+          ).length;
+        }
       } else if (needsNote) {
         const view = this.findMarkdownView();
         if (!view) {
@@ -884,6 +894,7 @@ export class ChatView extends ItemView {
         }
         const raw = (await this.plugin.app.vault.cachedRead(file)) ?? "";
         note = truncateByChars(this.stripFrontmatter(raw), 12000);
+        noteTitle = file.basename;
       } else if (needsSelection) {
         const view = this.findMarkdownView();
         if (!view) {
@@ -897,7 +908,21 @@ export class ChatView extends ItemView {
         }
       }
 
-      const rendered = applyTemplate(qp.prompt, { text, note });
+      // v0.1.7：可见气泡只显示 prompt 模板 + 紧凑 chip，绝不内联笔记正文。
+      //         笔记正文通过下面的系统消息通道送给模型（见 chatMsgs 构造处）。
+      //         {{text}} 保留：用户选中的文本是用户的动作，理应在气泡里可见。
+      let visibleNotePlaceholder = "";
+      if (note) {
+        if (this.contextScope === "folder" && this.contextFolder) {
+          visibleNotePlaceholder = `📎 已注入文件夹：${this.contextFolder.name}（${noteFileCount} 个文件）`;
+        } else if (noteTitle) {
+          visibleNotePlaceholder = `📎 已注入笔记：${noteTitle}（${note.length} 字）`;
+        } else {
+          visibleNotePlaceholder = `📎 已注入笔记（${note.length} 字）`;
+        }
+      }
+
+      const rendered = applyTemplate(qp.prompt, { text, note: visibleNotePlaceholder });
       this.appendUser(rendered);
 
       // 2. 建立 inflight（互斥锁 + 取消通道），直接发请求
@@ -908,7 +933,14 @@ export class ChatView extends ItemView {
       const sys = this.plugin.settings.systemPrompt.trim();
       if (sys) chatMsgs.push({ role: "system", content: sys });
 
-      // 不再注入 active note 上下文，笔记正文已在 user prompt 里
+      // v0.1.7：把笔记正文以系统消息的形式送给模型，避免把巨型正文塞进可见气泡
+      //         撑爆对话布局。framing 由 noteContextBlock() 提供 [笔记] {title} 前缀。
+      if (note) {
+        const title = noteTitle || "笔记";
+        const body = truncateByChars(noteContextBlock(title, note), 12000);
+        if (body) chatMsgs.push({ role: "system", content: body });
+      }
+
       for (const m of this.messages.filter((x) => x.role !== "system")) {
         chatMsgs.push({ role: m.role === "assistant" ? "assistant" : "user", content: m.content });
       }

@@ -58,6 +58,12 @@
   min-height: 0;
 }
 
+/* Defense in depth: cap any single message bubble height to keep the composer in view */
+.volo-msg-body {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
 .volo-empty {
   display: flex;
   align-items: center;
@@ -198,6 +204,8 @@
   flex-direction: column;
   gap: 6px;
   background: transparent;
+  /* Composer must never be compressed or pushed out by sibling overflow */
+  flex-shrink: 0;
 }
 /* ===========================================================
    v0.1.4 — Top bar polish
