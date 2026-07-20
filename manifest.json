@@ -1,11 +1,10 @@
 {
   "id": "volo",
   "name": "Volo",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "minAppVersion": "1.5.0",
   "description": "Adds a sidebar chat with LLMs, plus selection actions, whole-note processing, quick prompts, and section-scoped outlines. iOS ready. Use any OpenAI-compatible endpoint via the Base URL setting.",
   "author": "lonelysh",
-  "authorUrl": "https://github.com/lonelysh/volo",
-  "isDesktopOnly": false,
-  "main": "main.js"
+  "authorUrl": "https://github.com/lonelysh",
+  "isDesktopOnly": false
 }
