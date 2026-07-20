@@ -11,11 +11,15 @@
    * .view-content doesn't always propagate an explicit height, and
    * `flex: 1 1 auto` on .volo-chat-messages would push the composer below
    * the fold whenever the parent's height was intrinsic rather than
-   * definite. Grid with `auto / 1fr / auto` keeps the composer pinned
-   * to the bottom regardless of how the leaf was sized.
+   * definite. Grid keeps the composer pinned to the bottom regardless
+   * of how the leaf was sized.
+   *
+   * v0.1.12: 5 rows. Top has the note context (file name + line range),
+   * then the brand/pill top bar, then the scrollable dialog, then the
+   * composer, then the folder picker at the very bottom.
    */
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto auto 1fr auto auto;
   height: 100%;
   width: 100%;
   padding: 0;
@@ -1035,33 +1039,42 @@
 }
 
 /* ===========================================================
-   v0.1.6 — Context row beneath composer (file chip + folder chip + line details)
+   v0.1.6 — Context row beneath composer
+   v0.1.12 — Split: note context (top) + folder picker (bottom)
    - 顶栏移到右抽屉时不应触发侧栏撑大；所有顶级 chat 行强制 min-width:0
    - 11px 紧凑色，pill 形状（圆角），点击切换 scope
    =========================================================== */
 .volo-chat-root,
+.volo-chat-note-context,
 .volo-chat-top-bar,
 .volo-chat-messages,
 .volo-chat-input-area,
 .volo-chat-composer-row,
-.volo-chat-context-row {
+.volo-chat-folder-picker {
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
 }
 
-.volo-chat-context-row {
+/* v0.1.12 — note context：固定在顶部，📄 + 文件名 + 行号/选区 */
+.volo-chat-note-context {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: nowrap;
-  overflow: hidden;
-  padding: 4px 10px calc(4px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--background-modifier-border);
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--background-modifier-border);
   font-size: 11px;
   color: var(--text-muted);
-  background: transparent;
+  background: var(--background-secondary);
   flex: 0 0 auto;
+  min-height: 28px;
+  overflow: hidden;
+}
+.volo-note-context-icon {
+  flex: 0 0 auto;
+  font-size: 13px;
+  line-height: 1;
+  user-select: none;
 }
 
 .volo-context-chip {
@@ -1082,9 +1095,9 @@
   color: var(--text-normal);
 }
 .volo-context-chip.is-active {
-  background: var(--background-secondary);
-  color: var(--text-normal);
-  border-color: var(--background-modifier-border);
+  background: var(--interactive-accent);
+  color: var(--text-on-accent, #fff);
+  border-color: var(--interactive-accent);
 }
 
 .volo-context-details {
@@ -1095,4 +1108,63 @@
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+}
+
+/* v0.1.12 — folder picker：固定在最底部，pill 形状按钮 */
+.volo-chat-folder-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--background-modifier-border);
+  background: transparent;
+  flex: 0 0 auto;
+  min-height: 40px;
+}
+
+.volo-folder-picker-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  min-height: 32px;
+  max-width: 100%;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.volo-folder-picker-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+.volo-folder-picker-btn:active {
+  background: var(--background-modifier-hover);
+}
+.volo-folder-picker-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+.volo-folder-picker-btn.is-active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent, #fff);
+  border-color: var(--interactive-accent);
+}
+.volo-folder-picker-icon {
+  flex: 0 0 auto;
+  font-size: 13px;
+  line-height: 1;
+}
+.volo-folder-picker-label {
+  flex: 0 0 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100vw - 120px); /* leave room for the icon and padding on narrow phones */
 }
