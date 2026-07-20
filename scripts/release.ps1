@@ -194,6 +194,13 @@ if (-not $SkipBuild) { git add main.js }
 # commit too, otherwise the tagged commit points at the previous styles.css
 # while the release asset points at the working tree version. Split-brain.
 if (Test-Path 'styles.css') { git add styles.css }
+# src/ changes are what actually made main.js different from the previous
+# tag. Without staging them, the release commit only carries the rebuilt
+# bundle — anyone cloning the repo at this tag gets the old source. Stage
+# every modified tracked file under src/ so the tagged commit is a faithful
+# snapshot of the source the bundle was built from.
+$srcFiles = git diff --name-only -- src/
+if ($srcFiles) { git add -- $srcFiles }
 $staged = @(git diff --cached --name-only)
 if ($staged.Count -eq 0) {
     throw 'No staged changes. Aborting.'
@@ -216,6 +223,9 @@ if ($DryRun) {
         git reset HEAD -- main.js | Out-Null
         git checkout -- main.js
     }
+    # Restore any src/ files we staged
+    $srcFiles = git diff --name-only -- src/
+    if ($srcFiles) { git checkout -- $srcFiles }
     return
 }
 
