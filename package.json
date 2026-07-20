@@ -1,6 +1,6 @@
 {
   "name": "volo",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Volo — Obsidian plugin. Sidebar chat with LLMs (currently MiniMax / MiniMax / MiniMax family). iOS compatible.",
   "main": "main.js",
   "scripts": {
